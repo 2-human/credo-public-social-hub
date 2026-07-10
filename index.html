@@ -1,0 +1,259 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credo Legal — Social Campaign Hub</title>
+<style>
+  :root{
+    --red:#c92028; --ink:#1a1d23; --muted:#6b7280; --line:#e6e8ec; --bg:#f7f8fa;
+    --li:#0a66c2; --fb:#1877f2; --card:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg);
+    display:grid; grid-template-columns:340px 1fr; grid-template-rows:56px 1fr; height:100vh;
+  }
+  a{color:inherit}
+  /* topbar */
+  .topbar{grid-column:1/-1; display:flex; align-items:center; gap:14px; padding:0 18px;
+    background:#fff; border-bottom:1px solid var(--line); z-index:5}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; white-space:nowrap; flex-shrink:0; min-width:0}
+  .brand img{height:24px; width:auto; display:block}
+  .brand .t{font-size:14px; min-width:0}
+  .brand .t small{display:block; font-weight:500; color:var(--muted); font-size:11px; letter-spacing:.02em; white-space:nowrap}
+  .meta{color:var(--muted); font-size:12.5px; margin-left:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1}
+  .toolbar{display:flex; gap:8px; align-items:center}
+  .toolbar a{font-size:12.5px; color:var(--red); text-decoration:none; border:1px solid var(--line);
+    padding:5px 10px; border-radius:7px; white-space:nowrap; background:#fff}
+  .toolbar a:hover{background:#fff4f4; border-color:#f2c9cb}
+  /* sidebar */
+  .sidebar{border-right:1px solid var(--line); background:#fff; overflow:auto; display:flex; flex-direction:column}
+  .search{position:sticky; top:0; background:#fff; padding:12px; border-bottom:1px solid var(--line); z-index:2}
+  .search input{width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:8px; font-size:13px}
+  .list{padding:6px 6px 40px}
+  .pill-group{font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted); padding:12px 10px 5px; display:flex; justify-content:space-between}
+  .pill-group .cnt{color:#aab0ba; font-weight:600}
+  .art-link{display:block; text-decoration:none; color:inherit; padding:8px 10px; border-radius:8px;
+    border-left:3px solid transparent; cursor:pointer}
+  .art-link:hover{background:var(--bg)}
+  .art-link.active{background:#fff4f4; border-left-color:var(--red)}
+  .art-row{display:flex; gap:8px; align-items:baseline}
+  .art-num{color:#aab0ba; font-variant-numeric:tabular-nums; font-size:12px; font-weight:600; min-width:20px}
+  .art-title{font-size:13px; font-weight:600; line-height:1.35}
+  .art-sub{margin-left:28px; margin-top:2px; display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+  .chip{font-size:10.5px; color:var(--muted); background:var(--bg); border:1px solid var(--line);
+    border-radius:20px; padding:1px 8px}
+  /* main */
+  .main{overflow:auto; padding:0}
+  .empty{display:flex; height:100%; align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:40px}
+  .art-head{padding:22px 26px 10px; border-bottom:1px solid var(--line); background:#fff}
+  .art-h1{font-size:20px; font-weight:750; margin:0 0 6px; letter-spacing:-.01em}
+  .art-meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:12.5px}
+  .art-actions{margin-top:12px; display:flex; gap:10px; flex-wrap:wrap}
+  .viewlink{font-size:12.5px; color:var(--red); text-decoration:none; border:1px solid #f2c9cb;
+    padding:6px 11px; border-radius:7px; background:#fff4f4; font-weight:600}
+  .viewlink:hover{background:#ffe9ea}
+  .schedsum{font-size:12.5px; color:var(--muted); align-self:center}
+  /* platform tabs */
+  .ptabs{display:flex; gap:8px; padding:16px 26px 0}
+  .ptabs button{font:inherit; font-size:13px; font-weight:650; cursor:pointer; padding:7px 16px;
+    border-radius:9px 9px 0 0; border:1px solid var(--line); border-bottom:none; background:var(--bg); color:var(--muted)}
+  .ptabs button .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle}
+  .ptabs button.active{background:#fff; color:var(--ink)}
+  .ptabs button[data-p="linkedin"] .dot{background:var(--li)}
+  .ptabs button[data-p="facebook"] .dot{background:var(--fb)}
+  .ptabs button[data-p="linkedin"].active{box-shadow:inset 0 3px 0 var(--li)}
+  .ptabs button[data-p="facebook"].active{box-shadow:inset 0 3px 0 var(--fb)}
+  .cards{padding:0 26px 60px; display:grid; gap:16px; max-width:760px}
+  .cards.first{border-top:1px solid var(--line); padding-top:18px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+    box-shadow:0 1px 2px rgba(20,20,40,.04)}
+  .card-head{display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap}
+  .vbadge{font-size:11px; font-weight:700; color:#fff; border-radius:6px; padding:2px 8px}
+  .vbadge.li{background:var(--li)} .vbadge.fb{background:var(--fb)}
+  .unit{font-size:11.5px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .sched{margin-left:auto; font-size:12px; color:var(--ink); background:var(--bg); border:1px solid var(--line);
+    border-radius:20px; padding:3px 11px; font-weight:600; white-space:nowrap}
+  .sched .d{color:var(--muted); font-weight:500}
+  .body{font-size:15px; line-height:1.55; color:#22262e}
+  .wc{font-size:11px; color:#aab0ba; margin-top:6px}
+  .breakdown{margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; display:grid; gap:5px}
+  .bd{display:grid; grid-template-columns:74px 1fr; gap:8px; font-size:12.5px}
+  .bd .l{color:var(--muted); font-weight:700; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; padding-top:2px}
+  .bd .v{color:#3a3f47}
+  .cardfoot{margin-top:12px; display:flex; gap:8px; align-items:center}
+  .btn{font:inherit; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--line);
+    background:#fff; color:var(--ink); border-radius:7px; padding:5px 11px}
+  .btn:hover{background:var(--bg)}
+  .postlink{font-size:12px; color:var(--muted); text-decoration:none; margin-left:auto}
+  .postlink:hover{color:var(--red)}
+  @media (max-width:820px){
+    body{grid-template-columns:1fr; grid-template-rows:56px auto 1fr}
+    .sidebar{max-height:34vh}
+  }
+  @media (max-width:560px){
+    .brand .t small{display:none}
+    .meta{display:none}
+  }
+</style>
+
+<div class="topbar">
+  <span class="brand"><img src="assets/credo-logo.png" alt="Credo Legal"><span class="t">Social Campaign<small>Blog-derived posts · LinkedIn + Facebook</small></span></span>
+  <span class="meta" id="meta">Select an article to see its social posts and schedule</span>
+  <span class="toolbar">
+    <a href="calendar.html" id="t-cal">Calendar ↗</a>
+    <a href="https://start.credolegal.com" target="_blank" rel="noopener">credolegal.com ↗</a>
+  </span>
+</div>
+
+<aside class="sidebar">
+  <div class="search"><input id="q" type="search" placeholder="Search articles…  ( / )" autocomplete="off"></div>
+  <div class="list" id="list"></div>
+</aside>
+
+<main class="main" id="main">
+  <div class="empty" id="empty">Select an article from the left to view its 2 LinkedIn + 2 Facebook posts and their posting dates.</div>
+</main>
+
+<script src="social-posts.js"></script>
+<script>
+/* IIFE-scoped so nothing leaks into the classic-script global space shared with review-mode.js (which declares top-level esc/render). */
+(function () {
+  var DATA = window.CREDO_SOCIAL || { ARTICLES: [], POSTS: [] };
+  var ARTICLES = DATA.ARTICLES, POSTS = DATA.POSTS;
+  var PILLAR_ORDER = DATA.PILLAR_ORDER || [];
+  var postsBySlug = {};
+  POSTS.forEach(function (p) { (postsBySlug[p.articleSlug] = postsBySlug[p.articleSlug] || []).push(p); });
+
+  var $list = document.getElementById('list');
+  var $main = document.getElementById('main');
+  var $meta = document.getElementById('meta');
+  var $q = document.getElementById('q');
+  var curSlug = null, curPlatform = 'linkedin';
+
+  function esc2(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmtDate(iso){ var p = iso.split('-'); return MON[+p[1]-1] + ' ' + (+p[2]); }
+
+  function matches(a, f){
+    if (!f) return true; f = f.toLowerCase();
+    return (a.title + ' ' + a.slug + ' ' + a.pillar + ' ' + a.pillarLabel + ' s' + a.lifecycle).toLowerCase().indexOf(f) > -1;
+  }
+
+  function renderList(){
+    var f = $q.value.trim();
+    var groups = {}; ARTICLES.forEach(function(a){ (groups[a.pillar]=groups[a.pillar]||[]).push(a); });
+    var order = PILLAR_ORDER.filter(function(p){ return groups[p]; });
+    Object.keys(groups).forEach(function(p){ if(order.indexOf(p)<0) order.push(p); });
+    $list.innerHTML = '';
+    var n = 0, shown = 0;
+    order.forEach(function(pil){
+      var items = groups[pil].filter(function(a){ return matches(a, f); });
+      if (!items.length) { n += groups[pil].length; return; }
+      var h = document.createElement('div'); h.className = 'pill-group';
+      h.innerHTML = '<span>' + esc2(items[0].pillarLabel) + '</span><span class="cnt">' + items.length + '</span>';
+      $list.appendChild(h);
+      items.forEach(function(a){
+        var idx = ARTICLES.indexOf(a); shown++;
+        var el = document.createElement('a'); el.className = 'art-link' + (a.slug === curSlug ? ' active' : '');
+        el.href = '#' + a.slug; el.dataset.slug = a.slug;
+        el.innerHTML =
+          '<div class="art-row"><span class="art-num">' + String(idx+1).padStart(2,'0') + '</span>' +
+          '<span class="art-title">' + esc2(a.title) + '</span></div>' +
+          '<div class="art-sub"><span class="chip">' + esc2(a.pillar) + '</span>' +
+          '<span class="chip">stage ' + esc2(a.lifecycle) + '</span>' +
+          '<span class="chip">4 posts</span></div>';
+        el.addEventListener('click', function(e){ e.preventDefault(); select(a.slug); });
+        $list.appendChild(el);
+      });
+    });
+    if (!shown) $list.innerHTML = '<div class="pill-group"><span>No matches</span></div>';
+  }
+
+  function postCard(p){
+    var isLi = p.platform === 'linkedin';
+    return '<div class="card">' +
+      '<div class="card-head">' +
+        '<span class="vbadge ' + (isLi?'li':'fb') + '">' + (isLi?'LinkedIn':'Facebook') + ' · ' + p.variant + '</span>' +
+        '<span class="unit">' + esc2(p.unit) + '</span>' +
+        '<span class="sched">' + esc2(p.dow) + ' <b>' + fmtDate(p.date) + '</b> <span class="d">2026</span></span>' +
+      '</div>' +
+      '<div class="body" id="body-' + p.id + '">' + esc2(p.body) + '</div>' +
+      '<div class="wc">' + p.words + ' words</div>' +
+      '<div class="breakdown">' +
+        '<div class="bd"><span class="l">Context</span><span class="v">' + esc2(p.context) + '</span></div>' +
+        '<div class="bd"><span class="l">Problem</span><span class="v">' + esc2(p.problem) + '</span></div>' +
+        '<div class="bd"><span class="l">Advice</span><span class="v">' + esc2(p.advice) + '</span></div>' +
+      '</div>' +
+      '<div class="cardfoot">' +
+        '<button class="btn" data-copy="' + p.id + '">Copy post</button>' +
+        '<a class="postlink" href="' + esc2(p.link) + '" target="_blank" rel="noopener">links to blog article ↗</a>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderMain(){
+    var a = ARTICLES.filter(function(x){ return x.slug === curSlug; })[0];
+    if (!a) { $main.innerHTML = '<div class="empty" id="empty">Select an article from the left.</div>'; return; }
+    var mine = (postsBySlug[a.slug] || []);
+    var li = mine.filter(function(p){ return p.platform==='linkedin'; }).sort(byVar);
+    var fb = mine.filter(function(p){ return p.platform==='facebook'; }).sort(byVar);
+    var all = mine.map(function(p){return p.date;}).sort();
+    var list = curPlatform === 'linkedin' ? li : fb;
+    $main.innerHTML =
+      '<div class="art-head">' +
+        '<h1 class="art-h1">' + esc2(a.title) + '</h1>' +
+        '<div class="art-meta"><span class="chip">' + esc2(a.pillar) + ' · ' + esc2(a.pillarLabel) + '</span>' +
+          '<span class="chip">lifecycle stage ' + esc2(a.lifecycle) + '</span>' +
+          '<span class="chip">' + esc2(a.slug) + '</span></div>' +
+        '<div class="art-actions">' +
+          '<a class="viewlink" href="' + esc2(a.link) + '" target="_blank" rel="noopener">View blog article ↗</a>' +
+          '<span class="schedsum">4 posts · 2 LinkedIn, 2 Facebook · scheduled ' + fmtDate(all[0]) + '–' + fmtDate(all[all.length-1]) + ', 2026</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ptabs" id="ptabs">' +
+        '<button data-p="linkedin" class="' + (curPlatform==='linkedin'?'active':'') + '"><span class="dot"></span>LinkedIn (2)</button>' +
+        '<button data-p="facebook" class="' + (curPlatform==='facebook'?'active':'') + '"><span class="dot"></span>Facebook (2)</button>' +
+      '</div>' +
+      '<div class="cards first">' + list.map(postCard).join('') + '</div>';
+
+    document.getElementById('ptabs').addEventListener('click', function(e){
+      var b = e.target.closest('button[data-p]'); if (!b) return;
+      curPlatform = b.dataset.p; renderMain();
+    });
+    $main.querySelectorAll('[data-copy]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var p = mine.filter(function(x){ return x.id === btn.dataset.copy; })[0];
+        var text = p.body + '\n\n' + p.link;
+        navigator.clipboard && navigator.clipboard.writeText(text);
+        var t = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(function(){ btn.textContent = t; }, 1200);
+      });
+    });
+  }
+  function byVar(a,b){ return a.variant < b.variant ? -1 : 1; }
+
+  function select(slug){
+    curSlug = slug;
+    var a = ARTICLES.filter(function(x){ return x.slug === slug; })[0];
+    $meta.textContent = a ? (a.title + '  ·  ' + a.pillarLabel) : '';
+    history.replaceState(null, '', '#' + slug);
+    renderList(); renderMain();
+    var active = $list.querySelector('.art-link.active');
+    if (active) active.scrollIntoView({block:'nearest'});
+  }
+
+  $q.addEventListener('input', renderList);
+  document.addEventListener('keydown', function(e){
+    if (e.key === '/' && document.activeElement !== $q){ e.preventDefault(); $q.focus(); }
+  });
+
+  renderList();
+  var hash = decodeURIComponent(location.hash.replace('#',''));
+  if (hash && postsBySlug[hash]) select(hash);
+})();
+</script>
+
+<script src="review.config.js"></script>
+<script src="review-bootstrap.js"></script>

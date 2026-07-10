@@ -1,0 +1,206 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credo Legal — Social Media Calendar</title>
+<style>
+  :root{
+    --red:#c92028; --ink:#1a1d23; --muted:#6b7280; --line:#e6e8ec; --bg:#f7f8fa;
+    --li:#0a66c2; --fb:#1877f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg)}
+  a{color:inherit}
+  .topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:14px; padding:0 18px; height:56px;
+    background:#fff; border-bottom:1px solid var(--line)}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700}
+  .brand img{height:24px; display:block}
+  .brand .t{font-size:14px}
+  .brand .t small{display:block; font-weight:500; color:var(--muted); font-size:11px}
+  .spacer{flex:1}
+  .toolbar{display:flex; gap:8px; align-items:center}
+  .toolbar a,.toolbar button{font:inherit; font-size:12.5px; color:var(--red); text-decoration:none; border:1px solid var(--line);
+    padding:6px 11px; border-radius:7px; white-space:nowrap; background:#fff; cursor:pointer}
+  .toolbar a:hover,.toolbar button:hover{background:#fff4f4; border-color:#f2c9cb}
+  .filters{display:flex; gap:14px; align-items:center; padding:12px 22px; background:#fff; border-bottom:1px solid var(--line);
+    position:sticky; top:56px; z-index:19; flex-wrap:wrap}
+  .filters label{display:flex; gap:6px; align-items:center; font-size:13px; cursor:pointer}
+  .dot{width:10px; height:10px; border-radius:50%; display:inline-block}
+  .dot.li{background:var(--li)} .dot.fb{background:var(--fb)}
+  .hint{color:var(--muted); font-size:12px}
+  .wrap{padding:20px 22px 80px; max-width:1180px; margin:0 auto}
+  .month{margin-bottom:34px}
+  .month h2{font-size:16px; margin:0 0 10px; font-weight:750}
+  .dowrow,.grid{display:grid; grid-template-columns:repeat(7,1fr); gap:7px}
+  .dowrow div{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); padding:0 4px 4px}
+  .cell{background:#fff; border:1px solid var(--line); border-radius:9px; min-height:96px; padding:6px 7px; display:flex; flex-direction:column; gap:4px}
+  .cell.blank{background:transparent; border:none}
+  .cell.out{background:#fbfbfc}
+  .cell .dnum{font-size:11.5px; font-weight:700; color:#9aa1ac; font-variant-numeric:tabular-nums}
+  .cell.today .dnum{color:var(--red)}
+  .post{border-radius:6px; padding:4px 6px; cursor:pointer; border:1px solid transparent; text-align:left; font:inherit; width:100%}
+  .post.li{background:#eaf2fb; border-color:#d3e3f5}
+  .post.fb{background:#eaf1fe; border-color:#d3e1fb}
+  .post:hover{filter:brightness(.97)}
+  .post .pl{font-size:9.5px; font-weight:700; letter-spacing:.03em}
+  .post.li .pl{color:var(--li)} .post.fb .pl{color:var(--fb)}
+  .post .tt{font-size:11px; line-height:1.3; color:#33383f; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .cell.hidden-li .post.li, .cell.hidden-fb .post.fb{display:none}
+  /* modal */
+  .overlay{position:fixed; inset:0; background:rgba(18,20,26,.5); display:none; align-items:center; justify-content:center; z-index:40; padding:20px}
+  .overlay.on{display:flex}
+  .modal{background:#fff; border-radius:14px; max-width:560px; width:100%; padding:22px 24px; box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal .mh{display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap}
+  .vbadge{font-size:11px; font-weight:700; color:#fff; border-radius:6px; padding:2px 8px}
+  .vbadge.li{background:var(--li)} .vbadge.fb{background:var(--fb)}
+  .modal .when{margin-left:auto; font-size:12.5px; color:var(--muted)}
+  .modal h3{font-size:15px; margin:0 0 4px}
+  .modal .art{font-size:12px; color:var(--muted); margin-bottom:12px}
+  .modal .body{font-size:15px; line-height:1.55; background:var(--bg); border:1px solid var(--line); border-radius:9px; padding:12px 14px}
+  .modal .bd{display:grid; grid-template-columns:70px 1fr; gap:8px; font-size:12.5px; margin-top:8px}
+  .modal .bd .l{color:var(--muted); font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:.05em; padding-top:2px}
+  .modal .mfoot{margin-top:14px; display:flex; gap:8px; align-items:center}
+  .btn{font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; border:1px solid var(--line); background:#fff; border-radius:7px; padding:6px 12px}
+  .btn:hover{background:var(--bg)}
+  .btn.primary{background:var(--red); color:#fff; border-color:var(--red)}
+  .mlink{margin-left:auto; font-size:12px; color:var(--red); text-decoration:none}
+  .close{cursor:pointer; border:none; background:none; font-size:20px; color:var(--muted); line-height:1}
+</style>
+
+<div class="topbar">
+  <span class="brand"><img src="assets/credo-logo.png" alt="Credo Legal"><span class="t">Social Media Calendar<small>1 LinkedIn + 1 Facebook daily · Jul 20 – Oct 29, 2026</small></span></span>
+  <span class="spacer"></span>
+  <span class="toolbar">
+    <a href="index.html">← Hub</a>
+    <button id="csv">Export CSV</button>
+  </span>
+</div>
+
+<div class="filters">
+  <span class="hint" id="summary">…</span>
+  <span class="spacer" style="flex:1"></span>
+  <label><input type="checkbox" id="f-li" checked><span class="dot li"></span>LinkedIn</label>
+  <label><input type="checkbox" id="f-fb" checked><span class="dot fb"></span>Facebook</label>
+</div>
+
+<div class="wrap" id="wrap"></div>
+
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+
+<script src="social-posts.js"></script>
+<script>
+/* IIFE-scoped (shared classic-script globals with review-mode.js). */
+(function () {
+  var DATA = window.CREDO_SOCIAL || { POSTS: [] };
+  var POSTS = DATA.POSTS;
+  var byDate = {};
+  POSTS.forEach(function (p) { (byDate[p.date] = byDate[p.date] || {})[p.platform] = p; });
+
+  var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function esc2(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function iso(y,m,d){ return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
+
+  var dates = POSTS.map(function(p){return p.date;}).sort();
+  var first = dates[0], last = dates[dates.length-1];
+  document.getElementById('summary').textContent =
+    POSTS.length + ' posts · ' + POSTS.filter(function(p){return p.platform==='linkedin';}).length + ' LinkedIn + ' +
+    POSTS.filter(function(p){return p.platform==='facebook';}).length + ' Facebook · ' +
+    fmt(first) + ' – ' + fmt(last) + ', 2026';
+  function fmt(d){ var p=d.split('-'); return MON[+p[1]-1]+' '+(+p[2]); }
+
+  // months to render: Jul–Oct 2026
+  var MONTHS = [[2026,6],[2026,7],[2026,8],[2026,9]];
+  var wrap = document.getElementById('wrap');
+  function build(){
+    wrap.innerHTML = '';
+    MONTHS.forEach(function(ym){
+      var y=ym[0], m=ym[1];
+      var firstDow = new Date(Date.UTC(y,m,1)).getUTCDay();
+      var days = new Date(Date.UTC(y,m+1,0)).getUTCDate();
+      var mo = document.createElement('div'); mo.className='month';
+      var html = '<h2>'+['January','February','March','April','May','June','July','August','September','October','November','December'][m]+' '+y+'</h2>';
+      html += '<div class="dowrow">'+DOW.map(function(d){return '<div>'+d+'</div>';}).join('')+'</div><div class="grid">';
+      for (var i=0;i<firstDow;i++) html += '<div class="cell blank"></div>';
+      for (var d=1; d<=days; d++){
+        var dt = iso(y,m,d);
+        var cell = byDate[dt];
+        var inRange = dt>=first && dt<=last;
+        var cls = 'cell'+(inRange?'':' out');
+        html += '<div class="'+cls+'" data-date="'+dt+'"><div class="dnum">'+d+'</div>';
+        if (cell){
+          ['linkedin','facebook'].forEach(function(pl){
+            var p = cell[pl]; if(!p) return;
+            html += '<button class="post '+(pl==='linkedin'?'li':'fb')+'" data-id="'+p.id+'">'+
+                    '<div class="pl">'+(pl==='linkedin'?'LinkedIn':'Facebook')+'</div>'+
+                    '<div class="tt">'+esc2(p.articleTitle)+'</div></button>';
+          });
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+      mo.innerHTML = html;
+      wrap.appendChild(mo);
+    });
+    applyFilter();
+    wrap.querySelectorAll('.post').forEach(function(b){
+      b.addEventListener('click', function(){ openModal(b.dataset.id); });
+    });
+  }
+
+  var byId = {}; POSTS.forEach(function(p){ byId[p.id]=p; });
+  var overlay = document.getElementById('overlay'), modal = document.getElementById('modal');
+  function openModal(id){
+    var p = byId[id]; if(!p) return; var isLi = p.platform==='linkedin';
+    modal.innerHTML =
+      '<div class="mh"><span class="vbadge '+(isLi?'li':'fb')+'">'+(isLi?'LinkedIn':'Facebook')+' · '+p.variant+'</span>'+
+        '<span class="when">'+p.dow+' '+fmt(p.date)+', 2026</span>'+
+        '<button class="close" id="mclose">×</button></div>'+
+      '<div class="art">'+esc2(p.pillar)+' · '+esc2(p.pillarLabel)+' — '+esc2(p.articleTitle)+'</div>'+
+      '<div class="body">'+esc2(p.body)+'</div>'+
+      '<div class="bd"><span class="l">Context</span><span>'+esc2(p.context)+'</span></div>'+
+      '<div class="bd"><span class="l">Problem</span><span>'+esc2(p.problem)+'</span></div>'+
+      '<div class="bd"><span class="l">Advice</span><span>'+esc2(p.advice)+'</span></div>'+
+      '<div class="mfoot"><button class="btn primary" id="mcopy">Copy post</button>'+
+        '<span style="font-size:11.5px;color:#9aa1ac">'+p.words+' words</span>'+
+        '<a class="mlink" href="'+esc2(p.link)+'" target="_blank" rel="noopener">links to blog article ↗</a></div>';
+    overlay.classList.add('on');
+    document.getElementById('mclose').onclick = closeModal;
+    document.getElementById('mcopy').onclick = function(){
+      navigator.clipboard && navigator.clipboard.writeText(p.body+'\n\n'+p.link);
+      this.textContent='Copied ✓'; var b=this; setTimeout(function(){b.textContent='Copy post';},1200);
+    };
+  }
+  function closeModal(){ overlay.classList.remove('on'); }
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+  var fLi = document.getElementById('f-li'), fFb = document.getElementById('f-fb');
+  function applyFilter(){
+    wrap.querySelectorAll('.cell').forEach(function(c){
+      c.classList.toggle('hidden-li', !fLi.checked);
+      c.classList.toggle('hidden-fb', !fFb.checked);
+    });
+  }
+  fLi.addEventListener('change', applyFilter); fFb.addEventListener('change', applyFilter);
+
+  // CSV export
+  document.getElementById('csv').addEventListener('click', function(){
+    var rows = [['date','day','platform','variant','pillar','article_title','article_slug','unit','post','link']];
+    POSTS.slice().sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.platform<b.platform?-1:1); })
+      .forEach(function(p){ rows.push([p.date,p.dow,p.platform,p.variant,p.pillar,p.articleTitle,p.articleSlug,p.unit,p.body,p.link]); });
+    var csv = rows.map(function(r){ return r.map(function(c){
+      c = String(c==null?'':c); return /[",\n]/.test(c) ? '"'+c.replace(/"/g,'""')+'"' : c; }).join(','); }).join('\r\n');
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'credo-social-calendar_2026-07-20_to_2026-10-29.csv'; a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+  });
+
+  build();
+})();
+</script>
+
+<script src="review.config.js"></script>
+<script src="review-bootstrap.js"></script>
