@@ -11,7 +11,7 @@
   body{
     font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink); background:var(--bg);
-    display:grid; grid-template-columns:340px 1fr; grid-template-rows:56px 1fr; height:100vh;
+    display:grid; grid-template-columns:320px minmax(0,1fr) 400px; grid-template-rows:56px 1fr; height:100vh;
   }
   a{color:inherit}
   /* topbar */
@@ -42,65 +42,72 @@
   .art-num{color:#aab0ba; font-variant-numeric:tabular-nums; font-size:12px; font-weight:600; min-width:20px}
   .art-title{font-size:13px; font-weight:600; line-height:1.35}
   .art-sub{margin-left:28px; margin-top:2px; display:flex; gap:6px; align-items:center; flex-wrap:wrap}
-  .chip{font-size:10.5px; color:var(--muted); background:var(--bg); border:1px solid var(--line);
-    border-radius:20px; padding:1px 8px}
-  /* main */
-  .main{overflow:auto; padding:0}
-  .empty{display:flex; height:100%; align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:40px}
-  .art-head{padding:22px 26px 10px; border-bottom:1px solid var(--line); background:#fff}
-  .art-h1{font-size:20px; font-weight:750; margin:0 0 6px; letter-spacing:-.01em}
-  .art-meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:12.5px}
-  .art-actions{margin-top:12px; display:flex; gap:10px; flex-wrap:wrap}
-  .viewlink{font-size:12.5px; color:var(--red); text-decoration:none; border:1px solid #f2c9cb;
-    padding:6px 11px; border-radius:7px; background:#fff4f4; font-weight:600}
+  .chip{font-size:10.5px; color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:20px; padding:1px 8px}
+  /* blog pane (center) */
+  .blog{overflow:auto; background:#fff}
+  .pane-empty{display:flex; height:100%; align-items:center; justify-content:center; color:var(--muted); text-align:center; padding:40px}
+  .blog-head{position:sticky; top:0; background:#fff; padding:20px 30px 14px; border-bottom:1px solid var(--line); z-index:1}
+  .blog-kicker{font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--red); margin-bottom:6px}
+  .blog-h1{font-size:24px; font-weight:750; margin:0 0 10px; letter-spacing:-.01em; line-height:1.2}
+  .blog-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .viewlink{font-size:12.5px; color:var(--red); text-decoration:none; border:1px solid #f2c9cb; padding:6px 11px; border-radius:7px; background:#fff4f4; font-weight:600}
   .viewlink:hover{background:#ffe9ea}
-  .schedsum{font-size:12.5px; color:var(--muted); align-self:center}
-  /* platform tabs */
-  .ptabs{display:flex; gap:8px; padding:16px 26px 0}
-  .ptabs button{font:inherit; font-size:13px; font-weight:650; cursor:pointer; padding:7px 16px;
-    border-radius:9px 9px 0 0; border:1px solid var(--line); border-bottom:none; background:var(--bg); color:var(--muted)}
-  .ptabs button .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle}
-  .ptabs button.active{background:#fff; color:var(--ink)}
-  .ptabs button[data-p="linkedin"] .dot{background:var(--li)}
-  .ptabs button[data-p="facebook"] .dot{background:var(--fb)}
-  .ptabs button[data-p="linkedin"].active{box-shadow:inset 0 3px 0 var(--li)}
-  .ptabs button[data-p="facebook"].active{box-shadow:inset 0 3px 0 var(--fb)}
-  .cards{padding:0 26px 60px; display:grid; gap:16px; max-width:760px}
-  .cards.first{border-top:1px solid var(--line); padding-top:18px}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
-    box-shadow:0 1px 2px rgba(20,20,40,.04)}
-  .card-head{display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap}
-  .vbadge{font-size:11px; font-weight:700; color:#fff; border-radius:6px; padding:2px 8px}
+  .draftnote{font-size:11.5px; color:#aab0ba}
+  .article{padding:22px 30px 80px; max-width:720px; font-size:15.5px; line-height:1.68; color:#25292f}
+  .article h1{font-size:22px; margin:30px 0 10px; line-height:1.25}
+  .article h2{font-size:19px; font-weight:700; margin:28px 0 8px; line-height:1.3; letter-spacing:-.01em}
+  .article h3{font-size:16px; font-weight:700; margin:22px 0 6px}
+  .article p{margin:0 0 15px}
+  .article ul,.article ol{margin:0 0 15px; padding-left:22px}
+  .article li{margin:4px 0}
+  .article a{color:var(--red); text-decoration:underline; text-underline-offset:2px}
+  .article strong{font-weight:700}
+  .article blockquote{margin:0 0 16px; padding:8px 16px; border-left:3px solid var(--line); color:#4a4f57; font-style:italic}
+  .article hr{border:none; border-top:1px solid var(--line); margin:26px 0}
+  .article code{background:var(--bg); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:.9em}
+  .article table{border-collapse:collapse; width:100%; margin:6px 0 18px; font-size:14px}
+  .article th,.article td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top}
+  .article th{background:var(--bg); font-weight:700}
+  /* posts pane (right) */
+  .posts{overflow:auto; border-left:1px solid var(--line); background:var(--bg)}
+  .posts-head{position:sticky; top:0; background:var(--bg); padding:16px 20px 12px; border-bottom:1px solid var(--line); z-index:1}
+  .posts-title{font-size:13px; font-weight:700}
+  .posts-sub{font-size:11.5px; color:var(--muted); margin-top:2px}
+  .cards{padding:14px 18px 70px; display:grid; gap:14px}
+  .plabel{font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); margin:6px 2px 0; display:flex; align-items:center; gap:6px}
+  .plabel .dot{width:8px;height:8px;border-radius:50%}
+  .plabel .dot.li{background:var(--li)} .plabel .dot.fb{background:var(--fb)}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; box-shadow:0 1px 2px rgba(20,20,40,.04)}
+  .card-head{display:flex; align-items:center; gap:8px; margin-bottom:9px; flex-wrap:wrap}
+  .vbadge{font-size:10.5px; font-weight:700; color:#fff; border-radius:6px; padding:2px 8px}
   .vbadge.li{background:var(--li)} .vbadge.fb{background:var(--fb)}
-  .unit{font-size:11.5px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-  .sched{margin-left:auto; font-size:12px; color:var(--ink); background:var(--bg); border:1px solid var(--line);
-    border-radius:20px; padding:3px 11px; font-weight:600; white-space:nowrap}
+  .unit{font-size:11px; color:var(--muted); font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .sched{margin-left:auto; font-size:11.5px; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:20px; padding:2px 10px; font-weight:600; white-space:nowrap}
   .sched .d{color:var(--muted); font-weight:500}
-  .body{font-size:15px; line-height:1.55; color:#22262e}
-  .wc{font-size:11px; color:#aab0ba; margin-top:6px}
-  .breakdown{margin-top:12px; border-top:1px dashed var(--line); padding-top:10px; display:grid; gap:5px}
-  .bd{display:grid; grid-template-columns:74px 1fr; gap:8px; font-size:12.5px}
-  .bd .l{color:var(--muted); font-weight:700; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; padding-top:2px}
+  .body{font-size:14.5px; line-height:1.55; color:#22262e}
+  .wc{font-size:10.5px; color:#aab0ba; margin-top:6px}
+  .breakdown{margin-top:10px; border-top:1px dashed var(--line); padding-top:9px; display:grid; gap:5px}
+  .bd{display:grid; grid-template-columns:64px 1fr; gap:8px; font-size:12px}
+  .bd .l{color:var(--muted); font-weight:700; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; padding-top:2px}
   .bd .v{color:#3a3f47}
-  .cardfoot{margin-top:12px; display:flex; gap:8px; align-items:center}
-  .btn{font:inherit; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--line);
-    background:#fff; color:var(--ink); border-radius:7px; padding:5px 11px}
+  .cardfoot{margin-top:11px; display:flex; gap:8px; align-items:center}
+  .btn{font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:7px; padding:5px 10px}
   .btn:hover{background:var(--bg)}
-  .postlink{font-size:12px; color:var(--muted); text-decoration:none; margin-left:auto}
+  .postlink{font-size:11px; color:var(--muted); text-decoration:none; margin-left:auto}
   .postlink:hover{color:var(--red)}
-  @media (max-width:820px){
-    body{grid-template-columns:1fr; grid-template-rows:56px auto 1fr}
-    .sidebar{max-height:34vh}
+  @media (max-width:1000px){
+    body{grid-template-columns:1fr; grid-template-rows:56px auto auto auto; height:auto; min-height:100vh}
+    .sidebar{max-height:38vh; border-bottom:1px solid var(--line)}
+    .blog,.posts{overflow:visible}
+    .posts{border-left:none; border-top:1px solid var(--line)}
+    .blog-head,.posts-head,.search{position:static}
   }
-  @media (max-width:560px){
-    .brand .t small{display:none}
-    .meta{display:none}
-  }
+  @media (max-width:560px){ .brand .t small{display:none} .meta{display:none} }
 </style>
 
 <div class="topbar">
-  <span class="brand"><img src="assets/credo-logo.png" alt="Credo Legal"><span class="t">Social Campaign<small>Blog-derived posts · LinkedIn + Facebook</small></span></span>
-  <span class="meta" id="meta">Select an article to see its social posts and schedule</span>
+  <span class="brand"><img src="assets/credo-logo.png" alt="Credo Legal"><span class="t">Social Campaign<small>Blog article + its derived posts</small></span></span>
+  <span class="meta" id="meta">Select an article — the blog opens here, its social posts on the right</span>
   <span class="toolbar">
     <a href="calendar.html" id="t-cal">Calendar ↗</a>
     <a href="https://2-human.github.io/credo-public-harassment-lp/review.html" target="_blank" rel="noopener">LP review hub ↗</a>
@@ -113,30 +120,38 @@
   <div class="list" id="list"></div>
 </aside>
 
-<main class="main" id="main">
-  <div class="empty" id="empty">Select an article from the left to view its 2 LinkedIn + 2 Facebook posts and their posting dates.</div>
-</main>
+<section class="blog" id="blog">
+  <div class="pane-empty">Select an article on the left. The blog opens here; its 2 LinkedIn + 2 Facebook posts appear on the right.</div>
+</section>
+
+<aside class="posts" id="posts">
+  <div class="pane-empty" style="padding:24px">Social posts appear here.</div>
+</aside>
 
 <script src="social-posts.js"></script>
+<script src="articles-content.js"></script>
 <script>
 /* IIFE-scoped so nothing leaks into the classic-script global space shared with review-mode.js (which declares top-level esc/render). */
 (function () {
   var DATA = window.CREDO_SOCIAL || { ARTICLES: [], POSTS: [] };
+  var HTML = window.CREDO_ARTICLES_HTML || {};
   var ARTICLES = DATA.ARTICLES, POSTS = DATA.POSTS;
   var PILLAR_ORDER = DATA.PILLAR_ORDER || [];
   var postsBySlug = {};
   POSTS.forEach(function (p) { (postsBySlug[p.articleSlug] = postsBySlug[p.articleSlug] || []).push(p); });
 
   var $list = document.getElementById('list');
-  var $main = document.getElementById('main');
+  var $blog = document.getElementById('blog');
+  var $posts = document.getElementById('posts');
   var $meta = document.getElementById('meta');
   var $q = document.getElementById('q');
-  var curSlug = null, curPlatform = 'linkedin';
+  var curSlug = null;
 
   function esc2(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function fmtDate(iso){ var p = iso.split('-'); return MON[+p[1]-1] + ' ' + (+p[2]); }
+  function byVar(a,b){ return a.variant < b.variant ? -1 : 1; }
 
   function matches(a, f){
     if (!f) return true; f = f.toLowerCase();
@@ -149,10 +164,10 @@
     var order = PILLAR_ORDER.filter(function(p){ return groups[p]; });
     Object.keys(groups).forEach(function(p){ if(order.indexOf(p)<0) order.push(p); });
     $list.innerHTML = '';
-    var n = 0, shown = 0;
+    var shown = 0;
     order.forEach(function(pil){
       var items = groups[pil].filter(function(a){ return matches(a, f); });
-      if (!items.length) { n += groups[pil].length; return; }
+      if (!items.length) return;
       var h = document.createElement('div'); h.className = 'pill-group';
       h.innerHTML = '<span>' + esc2(items[0].pillarLabel) + '</span><span class="cnt">' + items.length + '</span>';
       $list.appendChild(h);
@@ -164,8 +179,7 @@
           '<div class="art-row"><span class="art-num">' + String(idx+1).padStart(2,'0') + '</span>' +
           '<span class="art-title">' + esc2(a.title) + '</span></div>' +
           '<div class="art-sub"><span class="chip">' + esc2(a.pillar) + '</span>' +
-          '<span class="chip">stage ' + esc2(a.lifecycle) + '</span>' +
-          '<span class="chip">4 posts</span></div>';
+          '<span class="chip">stage ' + esc2(a.lifecycle) + '</span><span class="chip">4 posts</span></div>';
         el.addEventListener('click', function(e){ e.preventDefault(); select(a.slug); });
         $list.appendChild(el);
       });
@@ -181,7 +195,7 @@
         '<span class="unit">' + esc2(p.unit) + '</span>' +
         '<span class="sched">' + esc2(p.dow) + ' <b>' + fmtDate(p.date) + '</b> <span class="d">2026</span></span>' +
       '</div>' +
-      '<div class="body" id="body-' + p.id + '">' + esc2(p.body) + '</div>' +
+      '<div class="body">' + esc2(p.body) + '</div>' +
       '<div class="wc">' + p.words + ' words</div>' +
       '<div class="breakdown">' +
         '<div class="bd"><span class="l">Context</span><span class="v">' + esc2(p.context) + '</span></div>' +
@@ -190,57 +204,54 @@
       '</div>' +
       '<div class="cardfoot">' +
         '<button class="btn" data-copy="' + p.id + '">Copy post</button>' +
-        '<a class="postlink" href="' + esc2(p.link) + '" target="_blank" rel="noopener">links to blog article ↗</a>' +
-      '</div>' +
-    '</div>';
+        '<a class="postlink" href="' + esc2(p.link) + '" target="_blank" rel="noopener">blog link ↗</a>' +
+      '</div></div>';
   }
 
-  function renderMain(){
-    var a = ARTICLES.filter(function(x){ return x.slug === curSlug; })[0];
-    if (!a) { $main.innerHTML = '<div class="empty" id="empty">Select an article from the left.</div>'; return; }
+  function renderBlog(a){
+    var body = HTML[a.slug] || '<p class="draftnote">Article content not bundled.</p>';
+    $blog.innerHTML =
+      '<div class="blog-head">' +
+        '<div class="blog-kicker">' + esc2(a.pillar) + ' · ' + esc2(a.pillarLabel) + ' · lifecycle stage ' + esc2(a.lifecycle) + '</div>' +
+        '<h1 class="blog-h1">' + esc2(a.title) + '</h1>' +
+        '<div class="blog-actions">' +
+          '<a class="viewlink" href="' + esc2(a.link) + '" target="_blank" rel="noopener">View live blog ↗</a>' +
+          '<span class="draftnote">Draft preview from content/blog/rewrites · publishes to ' + esc2(a.link.replace(/^https?:\/\//,'')) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<article class="article">' + body + '</article>';
+    $blog.scrollTop = 0;
+  }
+
+  function renderPosts(a){
     var mine = (postsBySlug[a.slug] || []);
     var li = mine.filter(function(p){ return p.platform==='linkedin'; }).sort(byVar);
     var fb = mine.filter(function(p){ return p.platform==='facebook'; }).sort(byVar);
     var all = mine.map(function(p){return p.date;}).sort();
-    var list = curPlatform === 'linkedin' ? li : fb;
-    $main.innerHTML =
-      '<div class="art-head">' +
-        '<h1 class="art-h1">' + esc2(a.title) + '</h1>' +
-        '<div class="art-meta"><span class="chip">' + esc2(a.pillar) + ' · ' + esc2(a.pillarLabel) + '</span>' +
-          '<span class="chip">lifecycle stage ' + esc2(a.lifecycle) + '</span>' +
-          '<span class="chip">' + esc2(a.slug) + '</span></div>' +
-        '<div class="art-actions">' +
-          '<a class="viewlink" href="' + esc2(a.link) + '" target="_blank" rel="noopener">View blog article ↗</a>' +
-          '<span class="schedsum">4 posts · 2 LinkedIn, 2 Facebook · scheduled ' + fmtDate(all[0]) + '–' + fmtDate(all[all.length-1]) + ', 2026</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="ptabs" id="ptabs">' +
-        '<button data-p="linkedin" class="' + (curPlatform==='linkedin'?'active':'') + '"><span class="dot"></span>LinkedIn (2)</button>' +
-        '<button data-p="facebook" class="' + (curPlatform==='facebook'?'active':'') + '"><span class="dot"></span>Facebook (2)</button>' +
-      '</div>' +
-      '<div class="cards first">' + list.map(postCard).join('') + '</div>';
-
-    document.getElementById('ptabs').addEventListener('click', function(e){
-      var b = e.target.closest('button[data-p]'); if (!b) return;
-      curPlatform = b.dataset.p; renderMain();
-    });
-    $main.querySelectorAll('[data-copy]').forEach(function(btn){
+    $posts.innerHTML =
+      '<div class="posts-head"><div class="posts-title">Social posts derived from this article</div>' +
+        '<div class="posts-sub">2 LinkedIn + 2 Facebook · scheduled ' + fmtDate(all[0]) + '–' + fmtDate(all[all.length-1]) + ', 2026</div></div>' +
+      '<div class="cards">' +
+        '<div class="plabel"><span class="dot li"></span>LinkedIn</div>' + li.map(postCard).join('') +
+        '<div class="plabel"><span class="dot fb"></span>Facebook</div>' + fb.map(postCard).join('') +
+      '</div>';
+    $posts.querySelectorAll('[data-copy]').forEach(function(btn){
       btn.addEventListener('click', function(){
         var p = mine.filter(function(x){ return x.id === btn.dataset.copy; })[0];
-        var text = p.body + '\n\n' + p.link;
-        navigator.clipboard && navigator.clipboard.writeText(text);
+        navigator.clipboard && navigator.clipboard.writeText(p.body + '\n\n' + p.link);
         var t = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(function(){ btn.textContent = t; }, 1200);
       });
     });
+    $posts.scrollTop = 0;
   }
-  function byVar(a,b){ return a.variant < b.variant ? -1 : 1; }
 
   function select(slug){
-    curSlug = slug;
     var a = ARTICLES.filter(function(x){ return x.slug === slug; })[0];
-    $meta.textContent = a ? (a.title + '  ·  ' + a.pillarLabel) : '';
+    if (!a) return;
+    curSlug = slug;
+    $meta.textContent = a.title + '  ·  ' + a.pillarLabel;
     history.replaceState(null, '', '#' + slug);
-    renderList(); renderMain();
+    renderList(); renderBlog(a); renderPosts(a);
     var active = $list.querySelector('.art-link.active');
     if (active) active.scrollIntoView({block:'nearest'});
   }
