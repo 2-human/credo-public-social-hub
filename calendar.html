@@ -65,6 +65,11 @@
   .btn.primary{background:var(--red); color:#fff; border-color:var(--red)}
   .mlink{margin-left:auto; font-size:12px; color:var(--red); text-decoration:none}
   .close{cursor:pointer; border:none; background:none; font-size:20px; color:var(--muted); line-height:1}
+
+  /* Review mode: reserve the widget's fixed 330px comment sidebar (right) so the
+     calendar snaps into the remaining width and no day cells sit under it. The
+     46px top banner is handled by the widget's own body{padding-top:46px}. */
+  html[data-review-mode="on"] body{ padding-right:340px; }
 </style>
 
 <div class="topbar">

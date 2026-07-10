@@ -103,6 +103,27 @@
     .blog-head,.posts-head,.search{position:static}
   }
   @media (max-width:560px){ .brand .t small{display:none} .meta{display:none} }
+
+  /* Review mode: the comment widget adds a fixed 330px sidebar on the right and a
+     46px banner on top. Reserve that space so the three columns SNAP into the
+     remaining width — the widget never overlays nav / blog / posts, and every
+     component in all three columns stays visible and commentable. (The 46px top
+     banner is already offset by the widget's own body{padding-top:46px}.) */
+  html[data-review-mode="on"] body{
+    width: calc(100vw - 340px);
+    grid-template-columns: 300px minmax(200px,1fr) 360px;
+  }
+  @media (max-width:1240px){
+    html[data-review-mode="on"] body{
+      grid-template-columns: 1fr;
+      grid-template-rows: 56px auto auto auto;
+      height: auto; min-height: 100vh;
+    }
+    html[data-review-mode="on"] .sidebar{ max-height: 40vh; border-bottom:1px solid var(--line); }
+    html[data-review-mode="on"] .blog, html[data-review-mode="on"] .posts{ overflow: visible; }
+    html[data-review-mode="on"] .posts{ border-left:none; border-top:1px solid var(--line); }
+    html[data-review-mode="on"] .blog-head, html[data-review-mode="on"] .posts-head, html[data-review-mode="on"] .search{ position: static; }
+  }
 </style>
 
 <div class="topbar">
