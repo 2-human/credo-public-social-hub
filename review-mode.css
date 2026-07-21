@@ -104,3 +104,15 @@
 
 /* Sidebar scope badge */
 [data-review-mode="on"] .review-row .rw-scope-badge{background:#eef7f0;color:#2f7d4e;border-radius:6px;padding:1px 7px;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:help}
+
+/* Comment status indicators (2026-07): commented components get a full outline —
+ * red while any comment is active/open, green when only resolved remain — plus a
+ * vertical stack of dots just outside the right border: one red dot per active
+ * comment, one green per resolved. */
+[data-review-mode="on"] [data-comment-id].has-comment,[data-review-mode="on"] [data-slot].has-comment{outline:2px solid var(--rw-deep);outline-offset:2px}
+[data-review-mode="on"] [data-comment-id].has-applied-comment,[data-review-mode="on"] [data-slot].has-applied-comment{outline:1.5px solid rgba(47,125,78,.6);outline-offset:2px}
+[data-review-mode="on"] .has-comment,[data-review-mode="on"] .has-applied-comment{position:relative}
+[data-review-mode="on"] .rw-dots{position:absolute;top:6px;left:100%;margin-left:6px;display:flex;flex-direction:column;gap:4px;z-index:6;pointer-events:none}
+[data-review-mode="on"] .rw-dot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.3)}
+[data-review-mode="on"] .rw-dot-active{background:var(--rw-deep)}
+[data-review-mode="on"] .rw-dot-resolved{background:#2f7d4e}

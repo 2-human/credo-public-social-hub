@@ -424,13 +424,29 @@ function render(){
   // outlines — when a comment has c.slot, attach to elements with that slot
   // on the current page (the slot is stable across LPs; the anchor isn't).
   document.querySelectorAll('.has-comment,.has-applied-comment').forEach(e=>e.classList.remove('has-comment','has-applied-comment'));
+  document.querySelectorAll('.rw-dots').forEach(e=>e.remove());
+  /* Group every applying comment by its target selector, tallying active (open)
+   * vs resolved. Each commented component then gets a full outline (red while any
+   * comment is open, green when only resolved remain) and a vertical stack of dots
+   * just outside its right border — one red dot per active comment, one green per
+   * resolved. */
+  const byTarget={};
   all.forEach(([id,c])=>{
     const st=statusOf(c);
-    if(st==='archived')return;
     const sel = c.slot
       ? '[data-slot="'+(window.CSS&&CSS.escape?CSS.escape(c.slot):c.slot)+'"]'
       : '[data-comment-id="'+(window.CSS&&CSS.escape?CSS.escape(c.anchor):c.anchor)+'"]';
-    document.querySelectorAll(sel).forEach(a=>a.classList.add(st==='applied'?'has-applied-comment':'has-comment'));
+    const r=byTarget[sel]||(byTarget[sel]={active:0,resolved:0});
+    if(st==='resolved')r.resolved++;else r.active++;
+  });
+  Object.keys(byTarget).forEach(sel=>{
+    const r=byTarget[sel];
+    document.querySelectorAll(sel).forEach(a=>{
+      a.classList.add(r.active>0?'has-comment':'has-applied-comment');
+      const d=document.createElement('span');d.className='rw-dots';d.setAttribute('aria-hidden','true');
+      let h='';for(let i=0;i<r.active;i++)h+='<i class="rw-dot rw-dot-active"></i>';for(let i=0;i<r.resolved;i++)h+='<i class="rw-dot rw-dot-resolved"></i>';
+      d.innerHTML=h;a.appendChild(d);
+    });
   });
   // list for current tab
   const want=TAB_OF[FILTER];
