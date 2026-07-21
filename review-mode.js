@@ -206,6 +206,8 @@ function when(ts){const d=new Date(ts||Date.now());return d.toLocaleDateString()
 let SIDE,LIST,TABS,PILL,ADAPTER,ME,COMMENTS={},FILTER='open',curEl=null,curId=null,hideT=null;
 let SELID=null,SELANCHOR=null; /* clicked comment: row id + its anchor (persist across re-renders) */
 const TAB_OF={open:'pending',resolved:'resolved'};
+let FOCUS_ID=(function(){try{return new URLSearchParams(location.search).get('rwfocus')||null;}catch(e){return null;}})();
+let FOCUS_TRIES=0; /* cross-page focus token (?rwfocus=<id>): spotlight this comment on arrival */
 
 function buildChrome(){
   const ban=el('div','review-banner');
@@ -417,7 +419,13 @@ function render(){
    * Untagged comments behave exactly as before; slot-portable comments show
    * on every LP whose CREDO_SLOTS.declared includes the slot AND whose SLUG
    * is in the comment's scope. */
-  const all=Object.entries(COMMENTS).filter(([id,c])=> c && commentAppliesHere(c));
+  /* GLOBAL sidebar list (2026-07-21): the list shows every comment across the
+   * whole hub, grouped by page, so a reviewer can click any comment and jump to
+   * its page. `all` drives the list + tab counts. On-page decoration (outlines /
+   * status dots) can only touch elements that actually live here, so it uses the
+   * page-scoped subset `pageComments`. */
+  const all=Object.entries(COMMENTS).filter(([id,c])=> c);
+  const pageComments=all.filter(([id,c])=> commentAppliesHere(c));
   const counts={pending:0,resolved:0};
   all.forEach(([id,c])=>{counts[statusOf(c)]=(counts[statusOf(c)]||0)+1});
   TABS.querySelectorAll('button').forEach(b=>{b.querySelector('.rw-c').textContent=counts[TAB_OF[b.dataset.k]]||0;});
@@ -431,7 +439,7 @@ function render(){
    * just outside its right border — one red dot per active comment, one green per
    * resolved. */
   const byTarget={};
-  all.forEach(([id,c])=>{
+  pageComments.forEach(([id,c])=>{
     const st=statusOf(c);
     const sel = c.slot
       ? '[data-slot="'+(window.CSS&&CSS.escape?CSS.escape(c.slot):c.slot)+'"]'
@@ -453,9 +461,23 @@ function render(){
   const rows=all.filter(([id,c])=>statusOf(c)===want).sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0));
   LIST.innerHTML='';
   if(!rows.length){LIST.appendChild(el('div','review-empty',esc(L.empty)));return}
-  rows.forEach(([id,c])=>{
+  /* Group by page (the origin slug, ignoring any #variant suffix). The current
+   * page floats to the top; the rest sort by their friendly label. Each group
+   * gets a header so the reviewer always knows where a comment lives. */
+  const groups={};
+  rows.forEach(entry=>{const pg=String(entry[1].page||'home').split('#')[0];(groups[pg]||(groups[pg]=[])).push(entry);});
+  const order=Object.keys(groups).sort((a,b)=>{
+    if(a===SLUG)return -1; if(b===SLUG)return 1;
+    return pageLabel(a).localeCompare(pageLabel(b));
+  });
+  order.forEach(pg=>{
+    const hdr=el('div','rw-group'+(pg===SLUG?' rw-group-here':''));
+    hdr.innerHTML='<span class="rw-group-name">'+esc(pg===SLUG?(L.thisPage||'This page'):pageLabel(pg))+'</span><span class="rw-group-count">'+groups[pg].length+'</span>';
+    LIST.appendChild(hdr);
+    groups[pg].forEach(([id,c])=>{
     const st=statusOf(c);
-    const row=el('div','review-row'+(id===SELID?' rw-selected':''));
+    const here=commentAppliesHere(c);
+    const row=el('div','review-row'+(id===SELID?' rw-selected':'')+(here?'':' rw-offpage'));
     const blabel=st==='resolved'?'resolved':'open';
     /* Scope badge (added 2026-06-30): if the comment is slot-portable, show
      * a small green chip stating which pages it applies to, so the reviewer
@@ -468,7 +490,8 @@ function render(){
       else n = 1;
       scopeBadge = ' <span class="rw-scope-badge" title="'+esc(c.slot)+'">applies to '+n+' page'+(n===1?'':'s')+'</span>';
     }
-    row.innerHTML='<div class="rw-meta"><b>'+esc(c.author||'Anonymous')+'</b><span class="rw-badge rw-'+st+'">'+blabel+'</span>'+scopeBadge+'<span>'+when(c.timestamp)+(c.edited_at?' · edited':'')+'</span></div>'+
+    const jumpChip = here ? '' : ' <span class="rw-jump" title="'+esc('Opens '+pageLabel(pg))+'">opens ↗</span>';
+    row.innerHTML='<div class="rw-meta"><b>'+esc(c.author||'Anonymous')+'</b><span class="rw-badge rw-'+st+'">'+blabel+'</span>'+scopeBadge+jumpChip+'<span>'+when(c.timestamp)+(c.edited_at?' · edited':'')+'</span></div>'+
       '<div class="rw-body">'+esc(c.comment||'')+'</div>'+
       (c.replacement?'<div class="rw-repl">↳ '+esc(c.replacement)+'</div>':'')+
       (st==='resolved'&&c.resolution?'<div class="rw-resolution">✓ '+esc(c.resolution)+'</div>':'')+
@@ -482,8 +505,13 @@ function render(){
     }
     acts.appendChild(actBtn(L.del,'delete-btn',()=>{if(confirm('Delete this comment?'))ADAPTER.remove(id)}));
     row.appendChild(acts);
-    row.onclick=()=>{SELID=id;spotlight(c);};
+    /* Same page → spotlight in place. Other page → navigate to its page (carrying
+     * the review session) with a focus token the target page consumes on load. */
+    row.onclick = here
+      ? (()=>{SELID=id;spotlight(c);})
+      : (()=>{location.href=commentHref(c,id);});
     LIST.appendChild(row);
+    });
   });
   applyActive();
 }
@@ -511,9 +539,46 @@ function spotlight(anchorOrComment){
   if(!a && slot) a = document.querySelector('[data-slot="'+(window.CSS&&CSS.escape?CSS.escape(slot):slot)+'"]');
   if(!a) a = document.querySelector('[data-comment-id="'+(window.CSS&&CSS.escape?CSS.escape(anchor):anchor)+'"]');
   applyActive();
-  if(!a)return;
+  if(!a)return null;
   a.scrollIntoView({behavior:'smooth',block:'center'});
   a.classList.remove('rw-spot');void a.offsetWidth;a.classList.add('rw-spot');setTimeout(()=>a.classList.remove('rw-spot'),1200);
+  return a;
+}
+/* Friendly page label for a slug: the hub catalog carries {slug,name}; fall back
+ * to the slug itself when the catalog hasn't been injected (postMessage) yet. */
+function pageLabel(slug){
+  if(!slug) return 'home';
+  for(const lp of LP_CATALOG){ if(lp && lp.slug===slug) return lp.name||slug; }
+  return slug;
+}
+/* URL to open a comment's page with the review session carried and a focus token
+ * the target page consumes on load. Prefer the comment's stored full url (most
+ * reliable); fall back to `<slug>.html` for legacy records without one. */
+function commentHref(c,id){
+  let path='';
+  try{ if(c.url) path=new URL(c.url, location.href).pathname; }catch(e){}
+  if(!path){ const pg=String(c.page||'home').split('#')[0]; path=(pg==='home'?'index':pg)+'.html'; }
+  const u=new URL(path, location.href);
+  u.searchParams.set('review','1');
+  u.searchParams.set('rwfocus', id);
+  return u.toString();
+}
+/* Cross-page focus handoff: when a page loads carrying ?rwfocus=<id>, spotlight
+ * that comment once its record is in memory. Retries a few times so a
+ * late-anchored target (MutationObserver-driven DOM) still resolves, then strips
+ * the token so a refresh / back-nav doesn't re-fire it. */
+function clearFocusToken(){try{const u=new URL(location.href);u.searchParams.delete('rwfocus');history.replaceState(null,'',u.toString());}catch(e){}}
+function maybeConsumeFocus(){
+  if(!FOCUS_ID)return;
+  const id=FOCUS_ID,c=COMMENTS[id];
+  if(!c){ if(++FOCUS_TRIES>20){FOCUS_ID=null;clearFocusToken();} return; } // wait for data; give up after ~a few seconds
+  FOCUS_ID=null;                                                          // consume once
+  SELID=id;
+  const wantKey=statusOf(c)==='resolved'?'resolved':'open';               // ensure the comment's tab is the active one
+  if(FILTER!==wantKey){FILTER=wantKey;if(TABS)TABS.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.k===wantKey));}
+  render();                                                               // reflect tab switch + row selection
+  let tries=0;
+  (function tryspot(){ const a=spotlight(c); if(!a && ++tries<6){setTimeout(tryspot,250);return;} clearFocusToken(); })();
 }
 
 (async function init(){
@@ -572,6 +637,6 @@ function spotlight(anchorOrComment){
    * calls this hook so the highlight pass re-matches comments to the now-current
    * variant. Per-dimension scoping falls out of the existing match-by-anchor. */
   window.__rwRefresh=render;
-  ADAPTER.subscribe(data=>{COMMENTS=data||{};render()});
+  ADAPTER.subscribe(data=>{COMMENTS=data||{};render();maybeConsumeFocus();});
 })();
 })();  /* end C6 js-isolation IIFE — see file head */

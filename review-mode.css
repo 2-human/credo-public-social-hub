@@ -116,3 +116,16 @@
 [data-review-mode="on"] .rw-dot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.3)}
 [data-review-mode="on"] .rw-dot-active{background:var(--rw-deep)}
 [data-review-mode="on"] .rw-dot-resolved{background:#2f7d4e}
+
+/* Global comment list (2026-07-21): the sidebar lists every comment across the
+ * whole hub, grouped by page. A group header labels each page (the current page
+ * floats to the top). Comments whose component lives on another page are marked
+ * `.rw-offpage` and carry an "opens ↗" chip — clicking them navigates there. */
+[data-review-mode="on"] .rw-group{display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:1;margin:10px 2px 6px;padding:4px 2px;font:600 11px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.03em;text-transform:uppercase;color:#8a9098;background:var(--rw-surf);border-bottom:1px solid #eceef0}
+[data-review-mode="on"] .rw-group:first-child{margin-top:2px}
+[data-review-mode="on"] .rw-group.rw-group-here{color:var(--rw-deep)}
+[data-review-mode="on"] .rw-group .rw-group-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+[data-review-mode="on"] .rw-group .rw-group-count{flex:none;background:#eef0f3;color:#65676b;border-radius:999px;padding:1px 7px;font-size:10.5px}
+[data-review-mode="on"] .rw-group.rw-group-here .rw-group-count{background:var(--rw-deep);color:#fff}
+[data-review-mode="on"] .review-row.rw-offpage{border-style:dashed}
+[data-review-mode="on"] .review-row .rw-jump{flex:none;color:var(--rw-deep);font-weight:600;letter-spacing:.02em}
