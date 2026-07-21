@@ -129,3 +129,10 @@
 [data-review-mode="on"] .rw-group.rw-group-here .rw-group-count{background:var(--rw-deep);color:#fff}
 [data-review-mode="on"] .review-row.rw-offpage{border-style:dashed}
 [data-review-mode="on"] .review-row .rw-jump{flex:none;color:var(--rw-deep);font-weight:600;letter-spacing:.02em}
+
+/* Scope toggle (2026-07-21): "This page" (default) vs "All pages" segmented
+ * control above the Open/Resolved tabs. */
+[data-review-mode="on"] .rw-scopebar{display:flex;gap:4px;margin:10px 12px;padding:3px;background:#eef0f3;border-radius:8px}
+[data-review-mode="on"] .rw-scopebar button{flex:1;border:none;background:none;padding:6px 8px;border-radius:6px;font:600 11.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#65676b;cursor:pointer;transition:background .12s,color .12s}
+[data-review-mode="on"] .rw-scopebar button.on{background:#fff;color:var(--rw-deep);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+[data-review-mode="on"] .rw-scopebar button:hover:not(.on){color:var(--rw-ink)}

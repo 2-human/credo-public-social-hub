@@ -23,7 +23,7 @@
     padding:6px 11px; border-radius:7px; white-space:nowrap; background:#fff; cursor:pointer}
   .toolbar a:hover,.toolbar button:hover{background:#fff4f4; border-color:#f2c9cb}
   .filters{display:flex; gap:14px; align-items:center; padding:12px 22px; background:#fff; border-bottom:1px solid var(--line);
-    position:sticky; top:56px; z-index:19; flex-wrap:wrap}
+    position:sticky; top:72px; z-index:19; flex-wrap:wrap}
   .filters label{display:flex; gap:6px; align-items:center; font-size:13px; cursor:pointer}
   .dot{width:10px; height:10px; border-radius:50%; display:inline-block}
   .dot.li{background:var(--li)} .dot.fb{background:var(--fb)}
@@ -72,20 +72,15 @@
   html[data-review-mode="on"] body{ padding-right:340px; }
 </style>
 
-<div class="topbar">
-  <span class="brand"><img src="assets/credo-logo.png" alt="Credo Legal"><span class="t">Social Media Calendar<small>1 LinkedIn + 1 Facebook daily · Jul 20 – Oct 29, 2026</small></span></span>
-  <span class="spacer"></span>
-  <span class="toolbar">
-    <a href="index.html">← Hub</a>
-    <button id="csv">Export CSV</button>
-  </span>
-</div>
+<div id="hub-header" data-page="social-cal" data-hub="social"></div>
+<script src="hub-header.js"></script>
 
 <div class="filters">
   <span class="hint" id="summary">…</span>
   <span class="spacer" style="flex:1"></span>
   <label><input type="checkbox" id="f-li" checked><span class="dot li"></span>LinkedIn</label>
   <label><input type="checkbox" id="f-fb" checked><span class="dot fb"></span>Facebook</label>
+  <span class="toolbar"><button id="csv">Export CSV</button></span>
 </div>
 
 <div class="wrap" id="wrap"></div>

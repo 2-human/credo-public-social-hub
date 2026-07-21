@@ -206,6 +206,7 @@ function when(ts){const d=new Date(ts||Date.now());return d.toLocaleDateString()
 let SIDE,LIST,TABS,PILL,ADAPTER,ME,COMMENTS={},FILTER='open',curEl=null,curId=null,hideT=null;
 let SELID=null,SELANCHOR=null; /* clicked comment: row id + its anchor (persist across re-renders) */
 const TAB_OF={open:'pending',resolved:'resolved'};
+let SCOPE='page'; /* sidebar list scope: 'page' (default — comments on this page only) | 'all' (every comment in the hub, grouped by page). Session-only; resets to 'page' each load. */
 let FOCUS_ID=(function(){try{return new URLSearchParams(location.search).get('rwfocus')||null;}catch(e){return null;}})();
 let FOCUS_TRIES=0; /* cross-page focus token (?rwfocus=<id>): spotlight this comment on arrival */
 
@@ -217,6 +218,14 @@ function buildChrome(){
 
   SIDE=el('aside','review-sidebar');
   SIDE.appendChild(el('h3',null,'<span>'+esc(L.sidebarTitle)+'</span>'));
+  /* Scope toggle: this page (default) vs every comment in the hub. */
+  const SCOPEBAR=el('div','rw-scopebar');
+  [['page',L.scopePage||'This page'],['all',L.scopeAll||'All pages']].forEach(([k,lbl])=>{
+    const b=el('button',k===SCOPE?'on':null,esc(lbl)); b.dataset.s=k;
+    b.onclick=()=>{SCOPE=k;SCOPEBAR.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.s===k));render();};
+    SCOPEBAR.appendChild(b);
+  });
+  SIDE.appendChild(SCOPEBAR);
   TABS=el('div','review-tabs');
   [['open',L.tabOpen],['resolved',L.tabResolved]].forEach(([k,lbl])=>{
     const b=el('button',k===FILTER?'on':null,esc(lbl)+' <span class="rw-c">0</span>'); b.dataset.k=k;
@@ -419,15 +428,16 @@ function render(){
    * Untagged comments behave exactly as before; slot-portable comments show
    * on every LP whose CREDO_SLOTS.declared includes the slot AND whose SLUG
    * is in the comment's scope. */
-  /* GLOBAL sidebar list (2026-07-21): the list shows every comment across the
-   * whole hub, grouped by page, so a reviewer can click any comment and jump to
-   * its page. `all` drives the list + tab counts. On-page decoration (outlines /
-   * status dots) can only touch elements that actually live here, so it uses the
-   * page-scoped subset `pageComments`. */
+  /* Sidebar list scope (2026-07-21): SCOPE 'all' lists every comment across the
+   * whole hub (grouped by page, cross-page click jumps); 'page' (default) lists
+   * only comments on the current page. `listSource` drives the list + tab counts.
+   * On-page decoration (outlines / status dots) can only touch elements that
+   * actually live here, so it always uses the page-scoped subset `pageComments`. */
   const all=Object.entries(COMMENTS).filter(([id,c])=> c);
   const pageComments=all.filter(([id,c])=> commentAppliesHere(c));
+  const listSource=SCOPE==='all'?all:pageComments;
   const counts={pending:0,resolved:0};
-  all.forEach(([id,c])=>{counts[statusOf(c)]=(counts[statusOf(c)]||0)+1});
+  listSource.forEach(([id,c])=>{counts[statusOf(c)]=(counts[statusOf(c)]||0)+1});
   TABS.querySelectorAll('button').forEach(b=>{b.querySelector('.rw-c').textContent=counts[TAB_OF[b.dataset.k]]||0;});
   // outlines — when a comment has c.slot, attach to elements with that slot
   // on the current page (the slot is stable across LPs; the anchor isn't).
@@ -458,7 +468,7 @@ function render(){
   });
   // list for current tab
   const want=TAB_OF[FILTER];
-  const rows=all.filter(([id,c])=>statusOf(c)===want).sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0));
+  const rows=listSource.filter(([id,c])=>statusOf(c)===want).sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0));
   LIST.innerHTML='';
   if(!rows.length){LIST.appendChild(el('div','review-empty',esc(L.empty)));return}
   /* Group by page (the origin slug, ignoring any #variant suffix). The current
