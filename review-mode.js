@@ -537,7 +537,10 @@ function spotlight(anchorOrComment){
    *     anchors existed; the pill would no-op once and the user would think
    *     'commenting on step 2 doesn't work'.
    *   - Watching childList+subtree only — render()'s class flips and
-   *     attribute writes are not observed, so we don't loop. As a safety net
+   *     attribute writes are not observed, so we don't loop. The ONE childList
+   *     mutation render() makes is appending the `.rw-dots` status stacks
+   *     (comment-status-indicators); those are skipped below so they don't
+   *     re-trigger render() (which would be an infinite loop). As a safety net
    *     we still skip nodes inside widget chrome below.
    */
   let _scheduled = false;
@@ -557,6 +560,7 @@ function spotlight(anchorOrComment){
       for(const node of m.addedNodes){
         if(!node || node.nodeType !== 1) continue;
         if(node.closest && node.closest(CHROME_SEL)) continue;
+        if(node.classList && node.classList.contains('rw-dots')) continue;   // our own status dots — not content to re-anchor (else render()'s append loops)
         _reanchorSoon();
         return;
       }
