@@ -27,6 +27,10 @@
   }
 
   document.documentElement.setAttribute('data-review-mode', 'on');
-  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'review-mode.css'; document.head.appendChild(css);
-  var js = document.createElement('script'); js.src = 'review-mode.js'; document.body.appendChild(js);
+  /* Cache-bust the widget assets (2026-09-22): GitHub Pages serves them with a
+   * 10-minute cache and browsers hold them far longer, so reviewers were seeing
+   * a stale widget for hours after a fix shipped. The page itself stays cached. */
+  var v = '?v=' + Date.now();
+  var css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'review-mode.css' + v; document.head.appendChild(css);
+  var js = document.createElement('script'); js.src = 'review-mode.js' + v; document.body.appendChild(js);
 })();
