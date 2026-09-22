@@ -515,7 +515,7 @@ function render(){
   });
   // list for current tab
   const want=TAB_OF[FILTER];
-  const rows=listSource.filter(([id,c])=>statusOf(c)===want).sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0));
+  const rows=readingOrder(listSource.filter(([id,c])=>statusOf(c)===want));
   LIST.innerHTML='';
   if(!rows.length){LIST.appendChild(el('div','review-empty',esc(L.empty)));return}
   /* Group by page (the origin slug, ignoring any #variant suffix). The current
@@ -597,6 +597,48 @@ function visibleTarget(el){
     if(r.width||r.height) return e;
   }
   return null;
+}
+function commentTarget(c){
+  if(!c) return null;
+  const sel = c.slot
+    ? '[data-slot="'+(window.CSS&&CSS.escape?CSS.escape(c.slot):c.slot)+'"]'
+    : '[data-comment-id="'+(window.CSS&&CSS.escape?CSS.escape(c.anchor):c.anchor)+'"]';
+  return visibleTarget(document.querySelector(sel));
+}
+/* Sidebar order (2026-09-22): reading order of the components themselves —
+ * top row left→right, then the next row, down to the bottom. Comments whose
+ * element isn't on this page (another LP's, in the hub's "all" scope) keep the
+ * old oldest-first order and sit after the placed ones inside their own group.
+ *
+ * Rows are found by vertical overlap rather than a fixed tolerance: an element
+ * joins the current row while it still starts above that row's running bottom,
+ * and the bottom shrinks to the shortest member so one tall element (a hero
+ * image beside a stack of cards) can't swallow everything below it. */
+function readingOrder(entries){
+  const pos=new Map();
+  entries.forEach(e=>{
+    const t=commentTarget(e[1]);
+    if(!t) return;
+    const r=t.getBoundingClientRect();
+    if(!r.width && !r.height) return;
+    pos.set(e[0],{top:r.top+window.pageYOffset,bottom:r.bottom+window.pageYOffset,left:r.left+window.pageXOffset});
+  });
+  const ts=e=>e[1].timestamp||0;
+  const placed=entries.filter(e=>pos.has(e[0])).sort((a,b)=>pos.get(a[0]).top-pos.get(b[0]).top||ts(a)-ts(b));
+  const band=new Map();
+  let row=0, bottom=-Infinity;
+  placed.forEach(e=>{
+    const p=pos.get(e[0]);
+    if(p.top>=bottom){ row++; bottom=p.bottom; }
+    else bottom=Math.min(bottom,p.bottom);
+    band.set(e[0],row);
+  });
+  placed.sort((a,b)=>
+    band.get(a[0])-band.get(b[0])
+    || pos.get(a[0]).left-pos.get(b[0]).left
+    || pos.get(a[0]).top-pos.get(b[0]).top
+    || ts(a)-ts(b));
+  return placed.concat(entries.filter(e=>!pos.has(e[0])).sort((a,b)=>ts(a)-ts(b)));
 }
 function applyActive(){
   document.querySelectorAll('.rw-active-anchor').forEach(e=>e.classList.remove('rw-active-anchor'));
