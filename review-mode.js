@@ -590,8 +590,14 @@ function render(){
 function applyActive(){
   document.querySelectorAll('.rw-active-anchor').forEach(e=>e.classList.remove('rw-active-anchor'));
   if(!SELANCHOR)return;
-  const sel='[data-comment-id="'+(window.CSS&&CSS.escape?CSS.escape(SELANCHOR):SELANCHOR)+'"]';
-  document.querySelectorAll(sel).forEach(a=>a.classList.add('rw-active-anchor'));
+  /* SELANCHOR is either a page anchor (…-h1-1) or, for a cross-LP comment, a
+   * slot name (hero.h1). Match both: before this the slot case matched nothing,
+   * so clicking a cross-page comment scrolled to the element but never outlined
+   * it. querySelectorAll because one anchor can legitimately match several
+   * elements (a headline repeated per variant). */
+  const v = (window.CSS&&CSS.escape) ? CSS.escape(SELANCHOR) : SELANCHOR;
+  document.querySelectorAll('[data-comment-id="'+v+'"],[data-slot="'+v+'"]')
+    .forEach(a=>a.classList.add('rw-active-anchor'));
 }
 function spotlight(anchorOrComment){
   /* Accepts either a bare anchor string (legacy) or a comment record (so we
