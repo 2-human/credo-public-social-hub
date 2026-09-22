@@ -521,16 +521,28 @@ function render(){
   /* Group by page (the origin slug, ignoring any #variant suffix). The current
    * page floats to the top; the rest sort by their friendly label. Each group
    * gets a header so the reviewer always knows where a comment lives. */
+  /* Group by origin page ONLY in hub-wide scope. Page scope lists nothing but
+   * comments that apply to the page in front of you, so a header saying which
+   * LP a slot comment was first written on adds nothing and — because the
+   * current page's group floats to the top — it would break the reading order
+   * the list is now sorted in. Flat list there, groups (each internally in
+   * reading order) in 'all'. */
+  const grouped = SCOPE==='all';
   const groups={};
-  rows.forEach(entry=>{const pg=String(entry[1].page||'home').split('#')[0];(groups[pg]||(groups[pg]=[])).push(entry);});
-  const order=Object.keys(groups).sort((a,b)=>{
-    if(a===SLUG)return -1; if(b===SLUG)return 1;
-    return pageLabel(a).localeCompare(pageLabel(b));
-  });
+  let order;
+  if(grouped){
+    rows.forEach(entry=>{const pg=String(entry[1].page||'home').split('#')[0];(groups[pg]||(groups[pg]=[])).push(entry);});
+    order=Object.keys(groups).sort((a,b)=>{
+      if(a===SLUG)return -1; if(b===SLUG)return 1;
+      return pageLabel(a).localeCompare(pageLabel(b));
+    });
+  } else { groups['']=rows; order=['']; }
   order.forEach(pg=>{
-    const hdr=el('div','rw-group'+(pg===SLUG?' rw-group-here':''));
-    hdr.innerHTML='<span class="rw-group-name">'+esc(pg===SLUG?(L.thisPage||'This page'):pageLabel(pg))+'</span><span class="rw-group-count">'+groups[pg].length+'</span>';
-    LIST.appendChild(hdr);
+    if(grouped){
+      const hdr=el('div','rw-group'+(pg===SLUG?' rw-group-here':''));
+      hdr.innerHTML='<span class="rw-group-name">'+esc(pg===SLUG?(L.thisPage||'This page'):pageLabel(pg))+'</span><span class="rw-group-count">'+groups[pg].length+'</span>';
+      LIST.appendChild(hdr);
+    }
     groups[pg].forEach(([id,c])=>{
     const st=statusOf(c);
     const here=commentAppliesHere(c);
@@ -552,7 +564,7 @@ function render(){
         scopeBadge = ' <span class="rw-scope-badge" title="'+esc(c.slot)+'">applies to '+n+' page'+(n===1?'':'s')+'</span>';
       }
     }
-    const jumpChip = here ? '' : ' <span class="rw-jump" title="'+esc('Opens '+pageLabel(pg))+'">opens ↗</span>';
+    const jumpChip = here ? '' : ' <span class="rw-jump" title="'+esc('Opens '+pageLabel(String(c.page||'home').split('#')[0]))+'">opens ↗</span>';
     /* Live-page chip (2026-09-22): links to the page this prototype shipped as.
      * Rendered per row so slot-portable comments resolve to the live counterpart
      * of the LP currently open, which is what a reviewer needs to compare. */
