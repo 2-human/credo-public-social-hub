@@ -587,6 +587,17 @@ function render(){
 /* persistent strong highlight on the currently-selected comment's element(s).
  * querySelectorAll because a campaign-wide headline anchor (hl-{i}) can match
  * several ads at once. */
+/* An anchor can land on an element the variant hides (e.g. the hero eyebrow is
+ * display:none under [data-labels="plain"]). Such an element cannot be scrolled
+ * to and shows no outline, so the click looks broken. Climb to the nearest
+ * ancestor that actually occupies space and use that instead. */
+function visibleTarget(el){
+  for(let e=el; e && e.getBoundingClientRect; e=e.parentElement){
+    const r=e.getBoundingClientRect();
+    if(r.width||r.height) return e;
+  }
+  return null;
+}
 function applyActive(){
   document.querySelectorAll('.rw-active-anchor').forEach(e=>e.classList.remove('rw-active-anchor'));
   if(!SELANCHOR)return;
@@ -597,7 +608,7 @@ function applyActive(){
    * elements (a headline repeated per variant). */
   const v = (window.CSS&&CSS.escape) ? CSS.escape(SELANCHOR) : SELANCHOR;
   document.querySelectorAll('[data-comment-id="'+v+'"],[data-slot="'+v+'"]')
-    .forEach(a=>a.classList.add('rw-active-anchor'));
+    .forEach(a=>{const t=visibleTarget(a); if(t) t.classList.add('rw-active-anchor');});
 }
 function spotlight(anchorOrComment){
   /* Accepts either a bare anchor string (legacy) or a comment record (so we
@@ -615,6 +626,7 @@ function spotlight(anchorOrComment){
   if(!a) a = document.querySelector('[data-comment-id="'+(window.CSS&&CSS.escape?CSS.escape(anchor):anchor)+'"]');
   applyActive();
   if(!a)return null;
+  a = visibleTarget(a) || a;
   a.scrollIntoView({behavior:'smooth',block:'center'});
   a.classList.remove('rw-spot');void a.offsetWidth;a.classList.add('rw-spot');setTimeout(()=>a.classList.remove('rw-spot'),1200);
   return a;
