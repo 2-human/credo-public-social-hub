@@ -128,6 +128,9 @@
 [data-review-mode="on"] .rw-group .rw-group-count{flex:none;background:#eef0f3;color:#65676b;border-radius:999px;padding:1px 7px;font-size:10.5px}
 [data-review-mode="on"] .rw-group.rw-group-here .rw-group-count{background:var(--rw-deep);color:#fff}
 [data-review-mode="on"] .review-row.rw-offpage{border-style:dashed}
+[data-review-mode="on"] .review-row .rw-live{flex:none;color:var(--rw-deep);font-weight:700;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;border:1px solid #f0c9cc;border-radius:6px;padding:1px 7px;background:#fff}
+[data-review-mode="on"] .review-row .rw-live:hover{background:#fdf1f1}
+[data-review-mode="on"] .review-row .rw-live-none{color:#8a918d;border-color:#e2e5e3;cursor:default}
 [data-review-mode="on"] .review-row .rw-jump{flex:none;color:var(--rw-deep);font-weight:600;letter-spacing:.02em}
 
 /* Scope toggle (2026-07-21): "This page" (default) vs "All pages" segmented

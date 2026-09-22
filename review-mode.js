@@ -151,6 +151,50 @@ function defaultScopeForSlot(slot){
   for(const p of prefixes){ if(slot.indexOf(p) === 0) return 'all'; }
   return 'single';
 }
+/* Live-page map (added 2026-09-22 with the Webflow audit): prototype key → the
+ * slug it shipped as on enroll.credolegal.com. Keyed by the prototype filename
+ * with the variant suffix stripped, so every variant of an LP resolves to the
+ * same live page. Seven prototypes have no live page yet and simply get no chip.
+ * Every comment row renders a "live ↗" link for the page it is being shown on —
+ * so a slot-portable comment points at the live counterpart of whichever LP the
+ * reviewer is looking at, not at the page it was written on. */
+const LIVE_BASE = 'https://enroll.credolegal.com/';
+const LIVE_MAP = {
+  'attorney': 'debt-harassment-fdcpa-attorney',
+  'cc-challenge': 'credit-card-debt-challenge',
+  'cc-lawsuit-records': 'credit-card-debt-lawsuit-records',
+  'cc-lawsuit-respond': 'credit-card-debt-lawsuit-respond',
+  'cc-negotiation': 'credit-card-debt-negotiation',
+  'cc-stop-calls': 'credit-card-debt-stop-calls',
+  'cc-violations': 'credit-card-debt-violations',
+  'garn-attorney': 'wage-garnishment-attorney',
+  'garn-exemptions': 'wage-garnishment-exemptions',
+  'garn-prevention': 'wage-garnishment-prevention',
+  'lawsuit-attorney': 'debt-lawsuit-attorney',
+  'lawsuit-fight-back': 'debt-lawsuit-fight-back',
+  'lawsuit-options': 'debt-lawsuit-options',
+  'lawsuit-proof': 'debt-lawsuit-proof',
+  'lawsuit-respond': 'debt-lawsuit-respond-on-time',
+  'lawsuit-summons': 'debt-lawsuit-summons-respond',
+  'med-bills-errors': 'medical-debt-bills-errors',
+  'med-credit-report': 'medical-debt-credit-report-removal',
+  'med-fdcpa-rights': 'medical-debt-fdcpa-rights',
+  'med-lawsuit-respond': 'medical-debt-lawsuit-respond',
+  'one-attorney': 'multiple-collectors-one-attorney',
+  'payday-harassment': 'payday-loan-debt-harassment',
+  'payday-violations': 'payday-loan-debt-violations',
+  'rights-verbatim': 'debt-harassment-fdcpa-rights',
+  'stop-calls': 'debt-harassment-stop-calls',
+  'violations': 'debt-harassment-violations'
+};
+function livePageUrl(){
+  const file = (location.pathname.split('/').pop() || '').replace(/\.html?$/, '');
+  const key = file.replace(/-locked-paired-(portrait|watercolor)(-noborders)?$/, '')
+                  .replace(/-sticky-rail-(portrait|watercolor)(-noborders)?$/, '');
+  const slug = LIVE_MAP[key] || null;
+  return slug ? (LIVE_BASE + slug) : null;
+}
+
 function commentAppliesHere(c){
   if(!c) return false;
   // 1) legacy single-page (no slot): match the page filter as before.
@@ -509,7 +553,14 @@ function render(){
       }
     }
     const jumpChip = here ? '' : ' <span class="rw-jump" title="'+esc('Opens '+pageLabel(pg))+'">opens ↗</span>';
-    row.innerHTML='<div class="rw-meta"><b>'+esc(c.author||'Anonymous')+'</b><span class="rw-badge rw-'+st+'">'+blabel+'</span>'+scopeBadge+jumpChip+'<span>'+when(c.timestamp)+(c.edited_at?' · edited':'')+'</span></div>'+
+    /* Live-page chip (2026-09-22): links to the page this prototype shipped as.
+     * Rendered per row so slot-portable comments resolve to the live counterpart
+     * of the LP currently open, which is what a reviewer needs to compare. */
+    const liveUrl = livePageUrl();
+    const liveChip = liveUrl
+      ? ' <a class="rw-live" href="'+esc(liveUrl)+'" target="_blank" rel="noopener" title="'+esc('Open the live page: '+liveUrl)+'">live ↗</a>'
+      : ' <span class="rw-live rw-live-none" title="This prototype has no live page yet">not live</span>';
+    row.innerHTML='<div class="rw-meta"><b>'+esc(c.author||'Anonymous')+'</b><span class="rw-badge rw-'+st+'">'+blabel+'</span>'+scopeBadge+liveChip+jumpChip+'<span>'+when(c.timestamp)+(c.edited_at?' · edited':'')+'</span></div>'+
       '<div class="rw-body">'+esc(c.comment||'')+'</div>'+
       (c.replacement?'<div class="rw-repl">↳ '+esc(c.replacement)+'</div>':'')+
       (st==='resolved'&&c.resolution?'<div class="rw-resolution">✓ '+esc(c.resolution)+'</div>':'')+
