@@ -165,8 +165,11 @@ function commentAppliesHere(c){
 }
 function scopeCountText(slot, scope){
   if(scope === 'all'){
-    const n = LP_CATALOG.length || 1;
-    return 'all ' + n + ' page' + (n === 1 ? '' : 's') + ' with this slot';
+    // LP_CATALOG is only populated when the page is embedded in the hub; standalone
+    // (opened directly, as reviewers usually do) it is empty — say "all pages"
+    // rather than the misleading "all 1 page".
+    const n = LP_CATALOG.length;
+    return n ? ('all ' + n + ' pages with this slot') : 'all pages with this slot';
   }
   if(Array.isArray(scope)) return scope.length + ' selected page' + (scope.length === 1 ? '' : 's');
   return 'this page only';
@@ -494,11 +497,16 @@ function render(){
      * scanning the sidebar can tell page-local from brand-wide at a glance. */
     let scopeBadge = '';
     if(c.slot){
-      let n;
-      if(c.scope === 'all') n = (LP_CATALOG.length || 1);
-      else if(Array.isArray(c.scope)) n = c.scope.length;
-      else n = 1;
-      scopeBadge = ' <span class="rw-scope-badge" title="'+esc(c.slot)+'">applies to '+n+' page'+(n===1?'':'s')+'</span>';
+      if(c.scope === 'all'){
+        // Standalone (no hub catalog) we cannot count the LPs — say "all pages"
+        // rather than "applies to 1 page", which read as page-local.
+        const n = LP_CATALOG.length;
+        const label = n ? ('applies to all ' + n + ' pages') : 'applies to all pages';
+        scopeBadge = ' <span class="rw-scope-badge" title="'+esc(c.slot)+'">'+label+'</span>';
+      } else {
+        const n = Array.isArray(c.scope) ? c.scope.length : 1;
+        scopeBadge = ' <span class="rw-scope-badge" title="'+esc(c.slot)+'">applies to '+n+' page'+(n===1?'':'s')+'</span>';
+      }
     }
     const jumpChip = here ? '' : ' <span class="rw-jump" title="'+esc('Opens '+pageLabel(pg))+'">opens ↗</span>';
     row.innerHTML='<div class="rw-meta"><b>'+esc(c.author||'Anonymous')+'</b><span class="rw-badge rw-'+st+'">'+blabel+'</span>'+scopeBadge+jumpChip+'<span>'+when(c.timestamp)+(c.edited_at?' · edited':'')+'</span></div>'+
